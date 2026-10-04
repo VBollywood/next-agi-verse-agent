@@ -1,29 +1,89 @@
-# Next AGI Verse - Main Agent
+import os
+import requests
 
-from content_agent import create_article_plan
-from image_agent import create_image_prompt
+BLOG_NAME = "Next AGI Verse"
+BLOG_URL = "https://nextagiverse.blogspot.com/"
+
+API_KEY = os.environ.get("GEMINI_API_KEY")
 
 
-def run_agent(topic):
+def ask_ai(topic):
+    url = (
+        "https://generativelanguage.googleapis.com/v1beta/models/"
+        "gemini-2.5-flash:generateContent?key=" + API_KEY
+    )
+
+    data = {
+        "contents": [
+            {
+                "parts": [
+                    {
+                        "text": f"""
+You are the AI content planning agent for the blog "{BLOG_NAME}".
+
+Blog URL:
+{BLOG_URL}
+
+Create an original and useful article plan about:
+
+{topic}
+
+Return:
+
+1. SEO title
+2. Meta description
+3. Article outline
+4. Important facts that should be verified
+5. Featured image concept
+6. 5 FAQ questions
+
+Rules:
+- Do not copy other websites.
+- Do not invent facts.
+- Make the content useful for readers.
+- Keep the language clear and easy to understand.
+"""
+                    }
+                ]
+            }
+        ]
+    }
+
+    response = requests.post(
+        url,
+        json=data,
+        timeout=60
+    )
+
+    response.raise_for_status()
+
+    result = response.json()
+
+    return result["candidates"][0]["content"]["parts"][0]["text"]
+
+
+def main():
+    topic = "AI Agents"
+
     print("🤖 Next AGI Verse Agent")
-    print("=" * 40)
+    print("🌐 Blog:", BLOG_URL)
+    print("🧠 Connecting to Gemini...")
 
-    # 1. Content
-    plan = create_article_plan(topic)
+    if not API_KEY:
+        print("❌ GEMINI_API_KEY is missing")
+        return
 
-    print("\n📝 ARTICLE")
-    print("Title:", plan["title"])
+    try:
+        answer = ask_ai(topic)
 
-    for section in plan["sections"]:
-        print("•", section)
+        print("\n========== AI RESULT ==========\n")
+        print(answer)
+        print("\n========== END ==========")
 
-    # 2. Image
-    print("\n🖼️ IMAGE PROMPT")
-    print(create_image_prompt(topic))
-
-    print("\n✅ Planning complete")
+    except Exception as error:
+        print("❌ Agent Error:")
+        print(error)
 
 
 if __name__ == "__main__":
-    topic = "AI Agents"
-    run_agent(topic)
+    main()
