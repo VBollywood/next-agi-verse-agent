@@ -10,7 +10,7 @@ API_KEY = os.environ.get("GEMINI_API_KEY")
 def ask_ai(topic):
     url = (
         "https://generativelanguage.googleapis.com/v1beta/models/"
-        "gemini-2.5-flash:generateContent?key=" + API_KEY
+        ""gemini-3.8-flash:generateContent?key=" + API_KEY" + API_KEY
     )
 
     data = {
