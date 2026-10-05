@@ -1,3 +1,4 @@
+
 name: Next AGI Verse Agent
 
 on:
@@ -6,6 +7,9 @@ on:
 jobs:
   run-agent:
     runs-on: ubuntu-latest
+
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
     steps:
       - name: Checkout repository
@@ -19,5 +23,5 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run Agent
+      - name: Run Next AGI Verse Agent
         run: python main.py
